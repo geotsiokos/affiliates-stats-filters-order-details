@@ -83,10 +83,12 @@ class Affiliates_Stats_Filters_Order_Details {
 	            if( isset( $result->post_id ) ) {
         		    if( get_post_type( $result->post_id ) == 'shop_order' ) {
         		        
+        		    	// Order id
         		        $order = new WC_Order( $result->post_id );
         		        $output .= 'Order #' . $result->post_id;
         		        $output .= '<br />';
         		        
+        		        // Order items
         		        if ( sizeof( $order->get_items() ) > 0 ) {
         		            foreach ( $order->get_items() as $item ) {
         		                
@@ -98,6 +100,17 @@ class Affiliates_Stats_Filters_Order_Details {
         		                }
         		            }
         		        }
+        		        
+        		        // Customer name
+        		        $customer_id = $order->get_customer_id();
+        		        if ( $customer = get_user_by( 'ID', $customer_id ) ) {
+        		        	$output .= $customer->first_name . ' ' . $customer->last_name;
+        		        	$output .= '<br />';
+        		        }
+        		        
+        		        // Order status
+        		        $output .= $order->get_status();
+        		        $output .= '<br />';
         		    }
 	            }
             break;
