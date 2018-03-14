@@ -3,8 +3,8 @@
  * Plugin Name: Affiliates Stats Filters Order Details
  * Plugin URI: http://www.itthinx.com/shop/affiliates-pro/
  * Description: Example plugin for the [affiliates_affiliate_stats type="stats-referrals"] shortcode rendering filters.
- * Version: 1.0.0
- * Author: gtsiokos
+ * Version: 1.0.1
+ * Author: George Tsiokos
  * Author URI: http://www.netpad.gr
  * License: GPLv3
  */
@@ -29,7 +29,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * 
 	 * The additional data will only be displayed if you include the field key in the shortcode's data attribute, for example:
 	 * [affiliates_affiliate_stats type="stats-referrals" data="custom-data"]
-	 * 
+	 *
 	 * @param array $data data set for the referral
 	 * @param object $result referral row
 	 * @return array
@@ -70,7 +70,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	/**
 	 * This filter is used to create the output for additional columns added via the
 	 * affiliates_affiliate_stats_renderer_column_display_names filter.
-	 * 
+	 *
 	 * @param string $output
 	 * @param string $key
 	 * @param object $result
@@ -79,7 +79,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {
 	    switch( $key ) {
 	        case 'extra_info' :
-	            
+
 	            if( isset( $result->post_id ) ) {
         		    if( get_post_type( $result->post_id ) == 'shop_order' ) {
         		        
@@ -89,9 +89,8 @@ class Affiliates_Stats_Filters_Order_Details {
         		        $output .= '<br />';
         		        
         		        // Order items
-        		        if ( sizeof( $order->get_items() ) > 0 ) {
+        		        if ( sizeof( $order->get_items() ) > 0 ) {        		        	
         		            foreach ( $order->get_items() as $item ) {
-        		                
         		                if ( $product = self::get_the_product_from_item( $item ) ) {
         		                    $output .= '<a href=" ' . get_permalink( $product->get_id() ) . ' " >';
             	                    $output .= $product->get_name();
@@ -101,13 +100,22 @@ class Affiliates_Stats_Filters_Order_Details {
         		            }
         		        }
         		        
-        		        // Customer name
+        		        // Customer details
         		        $customer_id = $order->get_customer_id();
+        		        $output .= $customer_id;
+        		        $output .= '<br />';
         		        if ( $customer = get_user_by( 'ID', $customer_id ) ) {
         		        	$output .= $customer->first_name . ' ' . $customer->last_name;
         		        	$output .= '<br />';
+        		        	$output .= $customer->user_email;
+        		        	$output .= '<br />';
+        		        } else {
+        		        	$output .= $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+        		        	$output .= '<br />';
+        		        	$output .= $order->get_billing_email();
+        		        	$output .= '<br />';
         		        }
-        		        
+
         		        // Order status
         		        $output .= $order->get_status();
         		        $output .= '<br />';
@@ -117,10 +125,10 @@ class Affiliates_Stats_Filters_Order_Details {
 		}
 		return $output;
 	}
-	
+
 	/**
 	 * Retrieve the product from an order item
-	 * 
+	 *
 	 * @param WC_Order_Item_Product $item
 	 * @return WC_Product|null
 	 */
@@ -129,7 +137,6 @@ class Affiliates_Stats_Filters_Order_Details {
 	        $product_id = $item->get_variation_id() ? $item->get_variation_id() : $item->get_product_id();	        
 	    } else {
 	        $product_id = $item->variation_id ? $item->variation_id : $item->product_id;
-	        
 	    }
 	    return new WC_Product( $product_id ) ? new WC_Product( $product_id ) : null;
 	}
