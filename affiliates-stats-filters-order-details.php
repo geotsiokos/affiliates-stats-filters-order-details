@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Affiliates Stats Filters Order Details
+ * Plugin Name: Affiliates Stats Filters Referral Details
  * Plugin URI: http://www.itthinx.com/shop/affiliates-pro/
  * Description: Example plugin for the [affiliates_affiliate_stats type="stats-referrals"] shortcode rendering filters.
  * Version: 1.0.1
@@ -49,7 +49,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * Here we simply wrap the data output in a div with a blue border and some added padding.
 	 * 
 	 * @param string $output
-	 * @param unknown $result referral row
+	 * @param string $result referral row
 	 * @return string
 	 */
 	public static function affiliates_affiliate_stats_renderer_data_output( $output, $result ) {
@@ -63,7 +63,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * @param array $column_display_names array maps keys to column display names
 	 */
 	public static function affiliates_affiliate_stats_renderer_column_display_names( $column_display_names ) {
-		$column_display_names['extra_info'] = 'Extra Info';
+		$column_display_names['extra_info'] = 'Data';
 		return $column_display_names;
 	}
 
@@ -79,66 +79,21 @@ class Affiliates_Stats_Filters_Order_Details {
 	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {
 	    switch( $key ) {
 	        case 'extra_info' :
-
-	            if( isset( $result->post_id ) ) {
-        		    if( get_post_type( $result->post_id ) == 'shop_order' ) {
-        		        
-        		    	// Order id
-        		        $order = new WC_Order( $result->post_id );
-        		        $output .= 'Order #' . $result->post_id;
-        		        $output .= '<br />';
-        		        
-        		        // Order items
-        		        if ( sizeof( $order->get_items() ) > 0 ) {        		        	
-        		            foreach ( $order->get_items() as $item ) {
-        		                if ( $product = self::get_the_product_from_item( $item ) ) {
-        		                    $output .= '<a href=" ' . get_permalink( $product->get_id() ) . ' " >';
-            	                    $output .= $product->get_name();
-            	                    $output .= '</a>';
-            	                    $output .= '<br />';
-        		                }
-        		            }
-        		        }
-        		        
-        		        // Customer details
-        		        $customer_id = $order->get_customer_id();
-        		        $output .= $customer_id;
-        		        $output .= '<br />';
-        		        if ( $customer = get_user_by( 'ID', $customer_id ) ) {
-        		        	$output .= $customer->first_name . ' ' . $customer->last_name;
-        		        	$output .= '<br />';
-        		        	$output .= $customer->user_email;
-        		        	$output .= '<br />';
-        		        } else {
-        		        	$output .= $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
-        		        	$output .= '<br />';
-        		        	$output .= $order->get_billing_email();
-        		        	$output .= '<br />';
-        		        }
-
-        		        // Order status
-        		        $output .= $order->get_status();
-        		        $output .= '<br />';
-        		    }
-	            }
+				if ( is_serialized( $result->data ) ) {
+					$data = unserialize( $result->data );
+				} else {
+					$data = $result->data;
+				}
+				write_log( $data );
+				foreach ( $data as $key ) {
+					if ( isset( $key['title'] ) && $key['value'] ) {
+						$output .= $key['title'] . ' ' . $key['value'];
+						$output .= '<br />';
+					}
+				}
             break;
 		}
 		return $output;
-	}
-
-	/**
-	 * Retrieve the product from an order item
-	 *
-	 * @param WC_Order_Item_Product $item
-	 * @return WC_Product|null
-	 */
-	public static function get_the_product_from_item( $item ) {
-	    if( method_exists( 'WC_Order_Item_Product', 'get_product_id' ) ) {
-	        $product_id = $item->get_variation_id() ? $item->get_variation_id() : $item->get_product_id();	        
-	    } else {
-	        $product_id = $item->variation_id ? $item->variation_id : $item->product_id;
-	    }
-	    return new WC_Product( $product_id ) ? new WC_Product( $product_id ) : null;
 	}
 }
 Affiliates_Stats_Filters_Order_Details::init();
