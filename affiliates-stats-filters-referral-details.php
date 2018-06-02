@@ -1,12 +1,16 @@
 <?php
 /**
  * Plugin Name: Affiliates Stats Filters Referral Details
- * Plugin URI: http://www.itthinx.com/shop/affiliates-pro/
+ * Plugin URI: https://github.com/geotsiokos/affiliates-stats-filters-referral-details
  * Description: Example plugin for the [affiliates_affiliate_stats type="stats-referrals"] shortcode rendering filters.
- * Version: 1.0.1
+ * Version: 1.0.0
  * Author: George Tsiokos
  * Author URI: http://www.netpad.gr
  * License: GPLv3
+ *
+ * @package affiates-stats-filters-referral-details
+ * @author gtsiokos
+ * @since 1.0.0
  */
 
 /**
@@ -26,7 +30,7 @@ class Affiliates_Stats_Filters_Order_Details {
 
 	/**
 	 * Allows to modify or extend the stored data set displayed for a referral.
-	 * 
+	 *
 	 * The additional data will only be displayed if you include the field key in the shortcode's data attribute, for example:
 	 * [affiliates_affiliate_stats type="stats-referrals" data="custom-data"]
 	 *
@@ -35,19 +39,18 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * @return array
 	 */
 	public static function affiliates_affiliate_stats_renderer_data( $data, $result ) {
-		$data['custom-data'] = array (
-			'title' => 'Custom Data',
+		$data['custom-data'] = array(
+			'title'  => 'Custom Data',
 			'domain' => 'affiliates',
-			'value' => sprintf( 'Some custom data could be displayed here for the referral with ID %d', intval( $result->referral_id ) ) 
+			'value'  => sprintf( 'Some custom data could be displayed here for the referral with ID %d', intval( $result->referral_id ) )
 		);
 		return $data;
 	}
 
 	/**
 	 * Allows to modify the output of the Details column displayed for a referral.
-	 * 
 	 * Here we simply wrap the data output in a div with a blue border and some added padding.
-	 * 
+	 *
 	 * @param string $output
 	 * @param string $result referral row
 	 * @return string
@@ -59,7 +62,7 @@ class Affiliates_Stats_Filters_Order_Details {
 
 	/**
 	 * Allows to modify and reorder the columns used to display referrals.
-	 * 
+	 *
 	 * @param array $column_display_names array maps keys to column display names
 	 */
 	public static function affiliates_affiliate_stats_renderer_column_display_names( $column_display_names ) {
@@ -77,21 +80,20 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * @return string
 	 */
 	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {
-	    switch( $key ) {
-	        case 'extra_info' :
+		switch ( $key ) {
+			case 'extra_info' :
 				if ( is_serialized( $result->data ) ) {
 					$data = unserialize( $result->data );
 				} else {
 					$data = $result->data;
 				}
-				write_log( $data );
 				foreach ( $data as $key ) {
 					if ( isset( $key['title'] ) && $key['value'] ) {
 						$output .= $key['title'] . ' ' . $key['value'];
 						$output .= '<br />';
 					}
 				}
-            break;
+				break;
 		}
 		return $output;
 	}
