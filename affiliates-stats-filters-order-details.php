@@ -49,7 +49,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * Here we simply wrap the data output in a div with a blue border and some added padding.
 	 * 
 	 * @param string $output
-	 * @param unknown $result referral row
+	 * @param string $result referral row
 	 * @return string
 	 */
 	public static function affiliates_affiliate_stats_renderer_data_output( $output, $result ) {
@@ -99,7 +99,7 @@ class Affiliates_Stats_Filters_Order_Details {
         		                }
         		            }
         		        }
-        		        
+
         		        // Customer details
         		        $customer_id = $order->get_customer_id();
         		        $output .= $customer_id;
@@ -116,13 +116,29 @@ class Affiliates_Stats_Filters_Order_Details {
         		        	$output .= '<br />';
         		        }
 
+        		        // Coupon details
+        		        $coupon_codes = $order->get_used_coupons();
+        		        if ( count ( $coupon_codes > 0 ) ) {
+	        		        foreach ( $coupon_codes as $coupon_code ) {
+								if ( class_exists( 'Affiliates_Attributes_WordPress' ) ) {
+									if ( null !== Affiliates_Attributes_WordPress::get_affiliate_for_coupon( $coupon_code ) ) {
+										if ( $result->affiliate_id == Affiliates_Attributes_WordPress::get_affiliate_for_coupon( $coupon_code ) ) {
+											$output .= 'Affiliate referred by coupon: ';
+											$output .= $coupon_code;
+											$output .= '<br />';
+										}
+									}
+								}
+							}
+        		        }
+
         		        // Order status
         		        $output .= $order->get_status();
         		        $output .= '<br />';
         		    }
 	            }
             break;
-		}
+		} // switch
 		return $output;
 	}
 
