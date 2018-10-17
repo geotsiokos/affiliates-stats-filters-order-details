@@ -39,11 +39,18 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * @return array
 	 */
 	public static function affiliates_affiliate_stats_renderer_data( $data, $result ) {
-		$data['custom-data'] = array(
-			'title' => 'Custom Data',
+		$data_result = unserialize( $result->data );
+		$referral_origin = 'affiliate';
+
+		if ( isset( $data_result['tier_level'] ) ) {
+			$referral_origin = 'tier level';
+		}
+		$data['origin-type'] = array(
+			'title'  => '',
 			'domain' => 'affiliates',
-			'value' => sprintf( 'Some custom data could be displayed here for the referral with ID %d', intval( $result->referral_id ) )
+			'value'  => sprintf( 'Referral origin: %s %d', $referral_origin, intval( $data_result['tier_level']['value'] ) )
 		);
+
 		return $data;
 	}
 
