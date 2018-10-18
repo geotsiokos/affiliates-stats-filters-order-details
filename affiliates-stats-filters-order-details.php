@@ -3,7 +3,7 @@
  * Plugin Name: Affiliates Stats Filters Order Details
  * Plugin URI: http://www.itthinx.com/shop/affiliates-pro/
  * Description: Example plugin for the [affiliates_affiliate_stats type="stats-referrals"] shortcode rendering filters.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: George Tsiokos
  * Author URI: http://www.netpad.gr
  * License: GPLv3
@@ -39,16 +39,11 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * @return array
 	 */
 	public static function affiliates_affiliate_stats_renderer_data( $data, $result ) {
-		$data_result = unserialize( $result->data );
-		$referral_origin = 'affiliate';
 
-		if ( isset( $data_result['tier_level'] ) ) {
-			$referral_origin = 'tier level';
-		}
 		$data['origin-type'] = array(
 			'title'  => '',
 			'domain' => 'affiliates',
-			'value'  => sprintf( 'Referral origin: %s %d', $referral_origin, intval( $data_result['tier_level']['value'] ) )
+			'value' => sprintf( 'Some custom data could be displayed here for the referral with ID %d', intval( $result->referral_id ) )
 		);
 
 		return $data;
@@ -75,6 +70,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	 */
 	public static function affiliates_affiliate_stats_renderer_column_display_names( $column_display_names ) {
 		$column_display_names['extra_info'] = 'Extra Info';
+		$column_display_names['origin-type'] = 'Origin';
 		return $column_display_names;
 	}
 
@@ -83,11 +79,11 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * affiliates_affiliate_stats_renderer_column_display_names filter.
 	 *
 	 * @param string $output
-	 * @param string $key
+	 * @param string $key column key
 	 * @param object $result
 	 * @return string
 	 */
-	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {
+	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {write_log( 'key');write_log( $key);
 		switch ( $key ) {
 			case 'extra_info' :
 
@@ -148,6 +144,16 @@ class Affiliates_Stats_Filters_Order_Details {
 						$output .= '<br />';
 					}
 				}
+				break;
+			case 'origin-type' :
+				$data_result = unserialize( $result->data );
+				$referral_origin = 'affiliate';
+				$referral_origin_value = '';
+				if ( isset( $data_result ) && isset( $data_result['tier_level'] ) ) {
+					$referral_origin = 'tier level';
+					$referral_origin_value = $data_result['tier_level']['value'];
+				}
+				$output .= sprintf( 'Referral origin: %s %s', $referral_origin, $referral_origin_value );
 				break;
 		} // switch
 		return $output;
