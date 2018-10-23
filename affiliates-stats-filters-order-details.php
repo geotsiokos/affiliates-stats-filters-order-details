@@ -83,7 +83,7 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * @param object $result
 	 * @return string
 	 */
-	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {write_log( 'key');write_log( $key);
+	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {
 		switch ( $key ) {
 			case 'extra_info' :
 
