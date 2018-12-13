@@ -86,8 +86,6 @@ class Affiliates_Stats_Filters_Order_Details {
 	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {
 		switch ( $key ) {
 			case 'extra_info' :
-
-//<<<<<<< HEAD
 	            if( isset( $result->post_id ) ) {
         		    if( get_post_type( $result->post_id ) == 'shop_order' ) {
         		        
