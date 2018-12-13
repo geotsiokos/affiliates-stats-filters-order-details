@@ -43,7 +43,7 @@ class Affiliates_Stats_Filters_Order_Details {
 		$data['origin-type'] = array(
 			'title'  => '',
 			'domain' => 'affiliates',
-			'value' => sprintf( 'Some custom data could be displayed here for the referral with ID %d', intval( $result->referral_id ) )
+			'value'  => sprintf( 'Some custom data could be displayed here for the referral with ID %d', intval( $result->referral_id ) )
 		);
 
 		return $data;
@@ -70,7 +70,6 @@ class Affiliates_Stats_Filters_Order_Details {
 	 */
 	public static function affiliates_affiliate_stats_renderer_column_display_names( $column_display_names ) {
 		$column_display_names['extra_info'] = 'Extra Info';
-		$column_display_names['origin-type'] = 'Origin';
 		return $column_display_names;
 	}
 
@@ -123,7 +122,6 @@ class Affiliates_Stats_Filters_Order_Details {
         		        	$output .= '<br />';
         		        }
 
-
 						// Coupon details
 						$coupon_codes = $order->get_used_coupons();
 						if ( count( $coupon_codes ) > 0 ) {
@@ -145,17 +143,17 @@ class Affiliates_Stats_Filters_Order_Details {
 						$output .= '<br />';
 					}
 				}
-				//break;
-			//case 'origin-type' :
 				$data_result = unserialize( $result->data );
-				$referral_origin = 'affiliate';
-				$referral_origin_value = '';
-				if ( isset( $data_result ) && isset( $data_result['tier_level'] ) ) {
-					$referral_origin = 'tier level';
-					$referral_origin_value = $data_result['tier_level']['value'];
+				if ( $data_result ) {
+					$referral_origin = 'affiliate';
+					$referral_origin_value = '';
+					if ( isset( $data_result ) && isset( $data_result['tier_level'] ) ) {
+						$referral_origin = 'tier level';
+						$referral_origin_value = $data_result['tier_level']['value'];
+					}
+					$output .= sprintf( '<strong>Referral origin:</strong> %s %s', $referral_origin, $referral_origin_value );
 				}
-				$output .= sprintf( 'Referral origin: %s %s', $referral_origin, $referral_origin_value );
-				break;
+			break;
 		} // switch
 		return $output;
 	}
