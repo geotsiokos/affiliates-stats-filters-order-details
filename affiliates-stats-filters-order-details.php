@@ -83,44 +83,48 @@ class Affiliates_Stats_Filters_Order_Details {
 	 * @return string
 	 */
 	public static function affiliates_affiliate_stats_renderer_column_output( $output, $key, $result ) {
+		$output = '';
 		switch ( $key ) {
 			case 'extra_info' :
-	            if( isset( $result->post_id ) ) {
-        		    if( get_post_type( $result->post_id ) == 'shop_order' ) {
-        		        
-        		    	// Order id
-        		        $order = new WC_Order( $result->post_id );
-        		        $output .= 'Order #' . $result->post_id;
-        		        $output .= '<br />';
-        		        
-        		        // Order items
-        		        if ( sizeof( $order->get_items() ) > 0 ) {
-        		            foreach ( $order->get_items() as $item ) {
-        		            	$product = self::get_the_product_from_item( $item );
-        		                if ( $product !== null ) {
-        		                    $output .= '<a href=" ' . get_permalink( $product->get_id() ) . ' " >';
-            	                    $output .= $product->get_name();
-            	                    $output .= '</a>';
-            	                    $output .= '<br />';
-        		                }
-        		            }
-        		        }
+				if( isset( $result->post_id ) ) {
+					if( get_post_type( $result->post_id ) == 'shop_order' ) {
+						// Order id
+						$order = new WC_Order( $result->post_id );
+						$output .= 'Order #' . $result->post_id;
+						$output .= '<br />';
 
-        		        // Customer details
-        		        $customer_id = $order->get_customer_id();
-        		        $output .= $customer_id;
-        		        $output .= '<br />';
-        		        if ( $customer = get_user_by( 'ID', $customer_id ) ) {
-        		        	$output .= $customer->first_name . ' ' . $customer->last_name;
-        		        	$output .= '<br />';
-        		        	$output .= $customer->user_email;
-        		        	$output .= '<br />';
-        		        } else {
-        		        	$output .= $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
-        		        	$output .= '<br />';
-        		        	$output .= $order->get_billing_email();
-        		        	$output .= '<br />';
-        		        }
+						// Order items
+						if ( sizeof( $order->get_items() ) > 0 ) {
+							foreach ( $order->get_items() as $item ) {
+								$product = self::get_the_product_from_item( $item );
+								if ( $product !== null ) {
+									$output .= '<a href=" ' . get_permalink( $product->get_id() ) . ' " >';
+									$output .= $product->get_name();
+									$output .= '</a>';
+									$output .= '<br />';
+								}
+							}
+						}
+
+						// Customer details
+						$customer_id = $order->get_customer_id();
+						// $output .= $customer_id;
+						// $output .= '<br />';
+						if ( $customer = get_user_by( 'ID', $customer_id ) ) {
+							$output .= 'First name: ' . $customer->first_name;
+							$output .= '<br />';
+							$output .= 'Last name: ' . $customer->last_name;
+							$output .= '<br />';
+							$output .= 'Email: ' . $customer->user_email;
+							$output .= '<br />';
+						} else {
+							$output .= 'First name: ' . $order->get_billing_first_name();
+							$output .= '<br />';
+							$output .= 'Last name: ' . $order->get_billing_last_name();
+							$output .= '<br />';
+							$output .= 'Email: ' . $order->get_billing_email();
+							$output .= '<br />';
+						}
 
 						// Coupon details
 						$coupon_codes = $order->get_used_coupons();
@@ -129,7 +133,7 @@ class Affiliates_Stats_Filters_Order_Details {
 								if ( class_exists( 'Affiliates_Attributes_WordPress' ) ) {
 									if ( null !== Affiliates_Attributes_WordPress::get_affiliate_for_coupon( $coupon_code ) ) {
 										if ( $result->affiliate_id == Affiliates_Attributes_WordPress::get_affiliate_for_coupon( $coupon_code ) ) {
-											$output .= 'Affiliate referred by coupon: ';
+											$output .= 'Referred by coupon: ';
 											$output .= $coupon_code;
 											$output .= '<br />';
 										}
@@ -139,19 +143,23 @@ class Affiliates_Stats_Filters_Order_Details {
 						}
 
 						// Order status
-						$output .= $order->get_status();
+						$output .= 'Order status: ' . $order->get_status();
 						$output .= '<br />';
-					}
-				}
-				$data_result = unserialize( $result->data );
-				if ( $data_result ) {
-					$referral_origin = 'affiliate';
-					$referral_origin_value = '';
-					if ( isset( $data_result ) && isset( $data_result['tier_level'] ) ) {
-						$referral_origin = 'tier level';
-						$referral_origin_value = $data_result['tier_level']['value'];
-					}
-					$output .= sprintf( '<strong>Referral origin:</strong> %s %s', $referral_origin, $referral_origin_value );
+
+						// Affiliate info
+						if ( class_exists( 'Affiliates_Multi_Tier' ) ) {
+							$data_result = unserialize( $result->data );
+							if ( $data_result ) {
+								$referral_origin = 'affiliate';
+								$referral_origin_value = '';
+								if ( isset( $data_result ) && isset( $data_result['tier_level'] ) ) {
+									$referral_origin = 'tier level';
+									$referral_origin_value = $data_result['tier_level']['value'];
+								}
+								$output .= sprintf( '<strong>Referral origin:</strong> %s %s', $referral_origin, $referral_origin_value );
+							}
+						}
+					} // post type order
 				}
 			break;
 		} // switch
